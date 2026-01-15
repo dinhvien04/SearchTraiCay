@@ -4,6 +4,17 @@ from qdrant_client import QdrantClient
 from torchvision.models import efficientnet_b0, EfficientNet_B0_Weights
 from PIL import Image
 import torch
+import requests as http_requests
+import os
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
+
+# ============== CONFIG ==============
+MEGALLM_API_KEY = os.getenv("MEGALLM_API_KEY")
+MEGALLM_MODEL = os.getenv("MEGALLM_MODEL", "gpt-5-mini")
+MEGALLM_BASE_URL = "https://ai.megallm.io/v1"
 
 #khởi tạo flask
 app = Flask(__name__, static_folder='static')
@@ -292,6 +303,159 @@ def compare_fruits():
         pass
     
     return render_template('compare.html', fruit1=fruit1, fruit2=fruit2, fruit_names=fruit_names)
+
+# ============== CHATBOT ==============
+# Hàm tìm kiếm context từ database cho chatbot
+def search_context_for_chat(query, top_k=5):
+    """Tìm kiếm thông tin liên quan từ database để trả lời câu hỏi"""
+    query_vector = get_text_vector(query)
+    results = search_by_vector("fruit_text", query_vector, top_k=top_k)
+    
+    context_items = []
+    for item in results:
+        normalized = normalize_result(item)
+        payload = normalized['payload']
+        context_items.append({
+            'name': payload.get('name', ''),
+            'description': payload.get('description', ''),
+            'keywords': payload.get('keywords', ''),
+            'origin': payload.get('origin', ''),
+            'color': payload.get('color', []),
+            'season': payload.get('season', []),
+            'category': payload.get('category', ''),
+            'score': normalized['score']
+        })
+    return context_items
+
+def call_megallm_api(messages):
+    """Gọi MegaLLM API để generate response"""
+    try:
+        if not MEGALLM_API_KEY or MEGALLM_API_KEY == "your_api_key_here":
+            print("⚠️ MEGALLM_API_KEY chưa được cấu hình!")
+            return None
+            
+        headers = {
+            "Authorization": f"Bearer {MEGALLM_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        
+        data = {
+            "model": MEGALLM_MODEL,
+            "messages": messages,
+            "max_tokens": 1000,
+            "temperature": 0.7
+        }
+        
+        print(f"🔄 Calling MegaLLM API with model: {MEGALLM_MODEL}")
+        
+        response = http_requests.post(
+            f"{MEGALLM_BASE_URL}/chat/completions",
+            headers=headers,
+            json=data,
+            timeout=30
+        )
+        
+        print(f"📡 Response status: {response.status_code}")
+        
+        if response.status_code == 200:
+            result = response.json()
+            return result['choices'][0]['message']['content']
+        else:
+            print(f"❌ MegaLLM API Error: {response.status_code} - {response.text}")
+            return None
+            
+    except Exception as e:
+        print(f"❌ Error calling MegaLLM: {e}")
+        return None
+
+def generate_chat_response(question, context_items):
+    """Tạo câu trả lời dựa trên context tìm được + LLM"""
+    
+    # Tạo context string từ database
+    context_str = ""
+    for item in context_items[:5]:
+        color = ', '.join(item['color']) if isinstance(item['color'], list) else item['color']
+        season = ', '.join(item['season']) if isinstance(item['season'], list) else item['season']
+        context_str += f"""
+- **{item['name']}**: {item['description']}
+  + Đặc điểm: {item['keywords']}
+  + Nguồn gốc: {item['origin']}
+  + Màu sắc: {color}
+  + Mùa vụ: {season}
+  + Loại: {item['category']}
+"""
+    
+    # System prompt
+    system_prompt = """Bạn là trợ lý FruitGo - chuyên gia về trái cây Việt Nam. 
+Nhiệm vụ: Trả lời câu hỏi về trái cây dựa trên thông tin được cung cấp.
+
+Quy tắc:
+1. Trả lời bằng tiếng Việt, thân thiện và dễ hiểu
+2. Sử dụng thông tin từ context được cung cấp
+3. Nếu không có thông tin, hãy nói rõ và gợi ý câu hỏi khác
+4. Có thể dùng emoji để sinh động hơn
+5. Trả lời ngắn gọn, súc tích (tối đa 200 từ)
+6. Highlight tên trái cây bằng **tên**"""
+
+    # User message với context
+    user_message = f"""Thông tin trái cây từ database:
+{context_str}
+
+Câu hỏi của người dùng: {question}
+
+Hãy trả lời câu hỏi dựa trên thông tin trên."""
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_message}
+    ]
+    
+    # Gọi LLM API
+    llm_response = call_megallm_api(messages)
+    
+    if llm_response:
+        return llm_response
+    else:
+        # Fallback nếu API lỗi
+        if context_items:
+            top = context_items[0]
+            return f"**{top['name']}**: {top['description']}\n\n📍 Nguồn gốc: {top['origin']}"
+        return "Xin lỗi, tôi không tìm thấy thông tin phù hợp. Bạn có thể hỏi về các loại trái cây Việt Nam!"
+
+@app.route('/chatbot')
+def chatbot_page():
+    return render_template('chatbot.html')
+
+@app.route('/api/chat', methods=['POST'])
+def chat_api():
+    try:
+        data = request.get_json()
+        question = data.get('message', '').strip()
+        
+        if not question:
+            return jsonify({'response': 'Vui lòng nhập câu hỏi!'})
+        
+        # Tìm context từ database
+        context_items = search_context_for_chat(question, top_k=10)
+        
+        # Tạo câu trả lời
+        response = generate_chat_response(question, context_items)
+        
+        # Trả về kèm danh sách trái cây liên quan
+        related_fruits = []
+        for item in context_items[:3]:
+            related_fruits.append({
+                'name': item['name'],
+                'image_url': f"http://localhost:5000/static/images/{item['name'].lower().replace(' ', '_')}.jpg"
+            })
+        
+        return jsonify({
+            'response': response,
+            'related_fruits': related_fruits
+        })
+        
+    except Exception as e:
+        return jsonify({'response': f'Có lỗi xảy ra: {str(e)}'})
 
 if __name__ == '__main__':
     app.run(debug=True)

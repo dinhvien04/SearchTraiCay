@@ -5,12 +5,21 @@
 {% block content %}
 <h2 style="margin-bottom:20px;">Tìm kiếm bằng từ khóa / Mô tả</h2>
 
-<form action="{{ url_for('search_text') }}" method="POST" style="margin-bottom: 30px;">
+<form action="{{ url_for('search_text') }}" method="POST" style="margin-bottom: 30px;" id="searchForm">
     <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
-        <div style="flex: 2; min-width: 250px;">
+        <div style="flex: 2; min-width: 250px; position: relative;">
             <label style="display: block; margin-bottom: 5px; color: #2e7d32; font-weight: 600;">Từ khóa / Mô tả</label>
-            <input type="text" name="keyword" placeholder="Nhập tên, mô tả, đặc điểm trái cây..." value="{{ keyword|default('') }}"
-                   style="padding:12px; width:100%; border: 2px solid #81c784; border-radius: 8px; box-sizing: border-box; font-size: 1rem;">
+            <div style="display: flex; gap: 10px;">
+                <input type="text" name="keyword" id="keywordInput" placeholder="Nhập tên, mô tả, đặc điểm trái cây..." value="{{ keyword|default('') }}"
+                       style="padding:12px; width:100%; border: 2px solid #81c784; border-radius: 8px; box-sizing: border-box; font-size: 1rem;">
+                <button type="button" id="voiceBtn" title="Tìm kiếm bằng giọng nói"
+                        style="padding: 12px 15px; background-color: #ff5722; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1.2rem; transition: all 0.3s;">
+                    🎤
+                </button>
+            </div>
+            <div id="voiceStatus" style="display: none; margin-top: 8px; padding: 8px 12px; background: #fff3e0; border-radius: 6px; color: #e65100; font-size: 0.9rem;">
+                🎙️ Đang nghe... Hãy nói tên trái cây!
+            </div>
         </div>
         
         <button type="submit"
@@ -92,4 +101,77 @@
 {% else %}
     <p style="margin-top:20px; color:#666;">Nhập từ khóa hoặc chọn bộ lọc để tìm kiếm trái cây.</p>
 {% endif %}
+
+<script>
+// Voice Search - Tìm kiếm bằng giọng nói
+const voiceBtn = document.getElementById('voiceBtn');
+const keywordInput = document.getElementById('keywordInput');
+const voiceStatus = document.getElementById('voiceStatus');
+const searchForm = document.getElementById('searchForm');
+
+// Kiểm tra trình duyệt hỗ trợ
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'vi-VN'; // Tiếng Việt
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    let isListening = false;
+
+    voiceBtn.addEventListener('click', () => {
+        if (isListening) {
+            recognition.stop();
+            return;
+        }
+        
+        recognition.start();
+    });
+
+    recognition.onstart = () => {
+        isListening = true;
+        voiceBtn.style.backgroundColor = '#d32f2f';
+        voiceBtn.innerHTML = '⏹️';
+        voiceStatus.style.display = 'block';
+        voiceStatus.innerHTML = '🎙️ Đang nghe... Hãy nói tên trái cây!';
+    };
+
+    recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+        }
+        keywordInput.value = transcript;
+        voiceStatus.innerHTML = '✅ Đã nhận: "' + transcript + '"';
+        
+        // Nếu là kết quả cuối cùng, tự động submit
+        if (event.results[event.results.length - 1].isFinal) {
+            setTimeout(() => {
+                searchForm.submit();
+            }, 500);
+        }
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        voiceStatus.innerHTML = '❌ Lỗi: ' + (event.error === 'no-speech' ? 'Không nghe thấy giọng nói' : event.error);
+        voiceStatus.style.background = '#ffebee';
+        voiceStatus.style.color = '#c62828';
+    };
+
+    recognition.onend = () => {
+        isListening = false;
+        voiceBtn.style.backgroundColor = '#ff5722';
+        voiceBtn.innerHTML = '🎤';
+        setTimeout(() => {
+            voiceStatus.style.display = 'none';
+        }, 2000);
+    };
+} else {
+    // Trình duyệt không hỗ trợ
+    voiceBtn.style.display = 'none';
+    console.log('Trình duyệt không hỗ trợ Speech Recognition');
+}
+</script>
 {% endblock %}
