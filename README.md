@@ -1,14 +1,16 @@
 # 🍎 FruitGo - Hệ thống tìm kiếm trái cây Việt Nam
 
-Ứng dụng web sử dụng AI để tìm kiếm và nhận diện trái cây Việt Nam thông qua từ khóa/mô tả hoặc hình ảnh.
+Ứng dụng web sử dụng AI để tìm kiếm và nhận diện trái cây Việt Nam thông qua từ khóa/mô tả, hình ảnh hoặc giọng nói.
 
 ## ✨ Tính năng
 
 - **Tìm kiếm bằng từ khóa/mô tả**: Nhập tên, đặc điểm, mô tả trái cây để tìm kiếm (semantic search)
-- **Tìm kiếm bằng hình ảnh**: Upload ảnh trái cây, hệ thống sẽ nhận diện và trả về kết quả tương tự
+- **Tìm kiếm bằng hình ảnh**: Upload ảnh trái cây, hệ thống nhận diện và trả về top 5 kết quả tương tự
+- **Tìm kiếm bằng giọng nói**: Nói tên trái cây bằng tiếng Việt để tìm kiếm
 - **Bộ lọc nâng cao**: Lọc theo màu sắc, mùa vụ, nguồn gốc
 - **So sánh trái cây**: So sánh thông tin chi tiết giữa 2 loại trái cây
 - **Gợi ý tương tự**: Xem các loại trái cây có đặc điểm tương tự
+- **Chatbot AI**: Hỏi đáp về trái cây với AI (RAG + LLM)
 
 ## 🛠️ Công nghệ sử dụng
 
@@ -16,7 +18,8 @@
 - **Vector Database**: Qdrant
 - **Text Embedding**: SentenceTransformers (paraphrase-multilingual-MiniLM-L12-v2)
 - **Image Embedding**: EfficientNet-B0 (PyTorch)
-- **Frontend**: HTML, CSS, Jinja2
+- **LLM API**: MegaLLM (GPT-5-mini)
+- **Frontend**: HTML, CSS, JavaScript, Jinja2
 
 ## 📦 Cài đặt
 
@@ -41,13 +44,24 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### 4. Khởi động Qdrant (Docker)
+### 4. Cấu hình environment
+
+Tạo file `.env` với nội dung:
+
+```env
+MEGALLM_API_KEY=your_api_key_here
+MEGALLM_MODEL=gpt-5-mini
+```
+
+> Lấy API key tại: https://megallm.io
+
+### 5. Khởi động Qdrant (Docker)
 
 ```bash
 docker run -p 6333:6333 qdrant/qdrant
 ```
 
-### 5. Tạo vector và insert vào database
+### 6. Tạo vector và insert vào database
 
 ```bash
 # Set PYTHONPATH
@@ -61,7 +75,7 @@ python qdrant_utils/insert_text_vectors.py
 python qdrant_utils/insert_image_vectors.py
 ```
 
-### 6. Chạy ứng dụng
+### 7. Chạy ứng dụng
 
 ```bash
 python app.py
@@ -75,6 +89,7 @@ Truy cập: http://localhost:5000
 SearchTraiCay/
 ├── app.py                    # Flask application
 ├── requirements.txt          # Python dependencies
+├── .env                      # Environment variables (không push lên git)
 ├── data/
 │   └── metadata/
 │       ├── fruit_metadata.csv
@@ -93,17 +108,18 @@ SearchTraiCay/
 ├── templates/
 │   ├── layout.html
 │   ├── home.html
-│   ├── search_text.html
-│   ├── search_image.html
-│   ├── fruit_detail.html
-│   └── compare.html
+│   ├── search_text.html      # Tìm kiếm từ khóa + giọng nói
+│   ├── search_image.html     # Tìm kiếm ảnh
+│   ├── fruit_detail.html     # Chi tiết + gợi ý tương tự
+│   ├── compare.html          # So sánh trái cây
+│   └── chatbot.html          # Chatbot AI
 └── README.md
 ```
 
 ## 📊 Dataset
 
 - **358 loại trái cây** Việt Nam
-- Thông tin bao gồm: tên, mô tả, đặc điểm, nguồn gốc, màu sắc, mùa vụ, category
+- Thông tin: tên, mô tả, đặc điểm, nguồn gốc, màu sắc, mùa vụ, category
 - Hình ảnh minh họa cho từng loại
 
 ## 🔍 Cách hoạt động
@@ -119,6 +135,18 @@ SearchTraiCay/
 2. Ảnh được chuyển thành vector embedding bằng EfficientNet-B0
 3. Tìm kiếm vector tương đồng trong collection ảnh
 4. Trả về top 5 kết quả giống nhất
+
+### Chatbot AI (RAG)
+1. Người dùng đặt câu hỏi
+2. Tìm kiếm thông tin liên quan từ database (Retrieval)
+3. Gửi context + câu hỏi cho LLM (MegaLLM)
+4. LLM trả lời dựa trên dữ liệu thực
+
+## 🖼️ Screenshots
+
+| Trang chủ | Tìm kiếm | Chatbot |
+|-----------|----------|---------|
+| ![Home](screenshots/home.png) | ![Search](screenshots/search.png) | ![Chat](screenshots/chat.png) |
 
 ## 📝 License
 
