@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}FruitGo{% endblock %}</title>
+  <style>
+    /* Reset & font */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #ffffff;
+      color: #1b5e20;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 16px;
+    }
+
+    header {
+      background-color: #4caf50;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      color: #e8f5e9;
+      gap: 25px;
+      width: 100%;
+    }
+
+        header h1 {
+      font-size: 2rem;
+      font-weight: 900;       /* in đậm hơn */
+      font-style: italic;     /* chữ nghiêng */
+      letter-spacing: 1.5px;
+      cursor: default;
+      margin-right: 10px;
+      color: #e7ffce;         /* màu xanh lá tươi sáng, dịu mắt hơn */
+      font-family: 'Georgia', serif;  /* font chữ serif đẹp, sang trọng */
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* bóng mờ nhẹ làm nổi bật chữ */
+    }
+
+    nav {
+      display: flex;
+      gap: 15px;
+    }
+
+    nav a {
+      background-color: #ffffff;
+      color: #388e3c;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(56, 142, 60, 0.3);
+      transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      user-select: none;
+    }
+
+    nav a:hover,
+    nav a:focus {
+      background-color: #81c784;
+      color: #1b5e20;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(56, 142, 60, 0.6);
+      outline: none;
+    }
+
+    main {
+      flex-grow: 1;
+      width: 100%;
+      color: #1b5e20;
+      /* Không padding trực tiếp ở main */
+    }
+
+    .container {
+      max-width: calc(100% - 200px); /* 100px mỗi bên */
+      margin: 0 auto;
+      padding: 40px 0;
+      box-sizing: border-box;
+      min-height: 100%;
+    }
+
+    footer {
+      background-color: #4caf50;
+      text-align: center;
+      padding: 15px 10px;
+      color: #e8f5e9;
+      font-size: 0.9rem;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px;
+        gap: 15px;
+      }
+
+      nav {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .container {
+        max-width: 100%;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>FruitGo</h1>
+    <nav>
+      <a href="/search-text">Tìm kiếm bằng từ khóa</a>
+      <a href="/search-image">Tìm kiếm bằng ảnh</a>
+      <a href="/compare">So sánh trái cây</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2025 FruitGo. Mọi quyền được bảo lưu.
+  </footer>
+</body>
+</html>

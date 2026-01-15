@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+
+# Data files (nặng)
+*.pkl
+*.pickle
+data/vectors/
+
+# Model cache
+.cache/
+*.pt
+*.pth
+*.bin
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker
+qdrant_storage/
+
+# Thư mục trùng lặp
+fruit_search/

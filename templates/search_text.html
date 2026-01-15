@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+
+{% block title %}Tìm kiếm theo từ khóa{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom:20px;">Tìm kiếm bằng từ khóa / Mô tả</h2>
+
+<form action="{{ url_for('search_text') }}" method="POST" style="margin-bottom: 30px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+        <div style="flex: 2; min-width: 250px;">
+            <label style="display: block; margin-bottom: 5px; color: #2e7d32; font-weight: 600;">Từ khóa / Mô tả</label>
+            <input type="text" name="keyword" placeholder="Nhập tên, mô tả, đặc điểm trái cây..." value="{{ keyword|default('') }}"
+                   style="padding:12px; width:100%; border: 2px solid #81c784; border-radius: 8px; box-sizing: border-box; font-size: 1rem;">
+        </div>
+        
+        <button type="submit"
+                style="padding:12px 30px; background-color:#81c784; color:white; border:none; border-radius:8px; font-weight: 600; cursor: pointer; font-size: 1rem;">
+            🔍 Tìm kiếm
+        </button>
+    </div>
+    
+    <details style="margin-top: 15px;">
+        <summary style="cursor: pointer; color: #388e3c; font-weight: 600;">⚙️ Bộ lọc nâng cao</summary>
+        <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; padding: 15px; background: #f1f8e9; border-radius: 8px;">
+            <div style="flex: 1; min-width: 120px;">
+                <label style="display: block; margin-bottom: 5px; color: #2e7d32; font-weight: 600;">Màu sắc</label>
+                <select name="color" style="padding:10px; width:100%; border: 2px solid #81c784; border-radius: 8px; background: white;">
+                    <option value="">-- Tất cả --</option>
+                    {% for color in filter_options.colors|default([]) %}
+                    <option value="{{ color }}" {% if selected_color == color %}selected{% endif %}>{{ color }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div style="flex: 1; min-width: 120px;">
+                <label style="display: block; margin-bottom: 5px; color: #2e7d32; font-weight: 600;">Mùa vụ</label>
+                <select name="season" style="padding:10px; width:100%; border: 2px solid #81c784; border-radius: 8px; background: white;">
+                    <option value="">-- Tất cả --</option>
+                    {% for season in filter_options.seasons|default([]) %}
+                    <option value="{{ season }}" {% if selected_season == season %}selected{% endif %}>{{ season }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div style="flex: 1; min-width: 150px;">
+                <label style="display: block; margin-bottom: 5px; color: #2e7d32; font-weight: 600;">Nguồn gốc</label>
+                <select name="origin" style="padding:10px; width:100%; border: 2px solid #81c784; border-radius: 8px; background: white;">
+                    <option value="">-- Tất cả --</option>
+                    {% for origin in filter_options.origins|default([]) %}
+                    <option value="{{ origin }}" {% if selected_origin == origin %}selected{% endif %}>{{ origin }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </details>
+</form>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class="messages" style="color:red; margin-bottom:20px;">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+{% if results %}
+    <h3>Kết quả tìm kiếm: {{ results|length }} trái cây</h3>
+    <div style="margin-top:20px; display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+        {% for item in results %}
+            <a href="/fruit/{{ item.payload.name }}" style="text-decoration:none;">
+                <div style="background:white; border-radius:12px; padding:15px; text-align:center;
+                            box-shadow:0 4px 8px rgba(0,0,0,0.1); transition: transform 0.2s ease; height: 100%;">
+                    <img src="{{ item.payload.image_url }}" alt="{{ item.payload.name }}"
+                         style="width:100%; height:150px; object-fit:cover; border-radius:8px;">
+                    <strong style="color:#2e7d32; font-size:1.1rem; display:block; margin-top:10px;">
+                        {{ item.payload.name }}
+                    </strong>
+                    {% if item.payload.origin %}
+                    <div style="color:#666; font-size:0.9rem; margin-top:5px;">📍 {{ item.payload.origin }}</div>
+                    {% endif %}
+                    {% if item.score and item.score < 1 %}
+                    <div style="color:#888; font-style:italic; font-size:0.85rem;">Độ tương đồng: {{ (item.score * 100)|round(1) }}%</div>
+                    {% endif %}
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% elif keyword or selected_color or selected_season or selected_origin %}
+    <p style="margin-top:20px; color:#888;">Không tìm thấy kết quả phù hợp.</p>
+{% else %}
+    <p style="margin-top:20px; color:#666;">Nhập từ khóa hoặc chọn bộ lọc để tìm kiếm trái cây.</p>
+{% endif %}
+{% endblock %}

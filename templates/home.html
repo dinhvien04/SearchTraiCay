@@ -1,0 +1,128 @@
+<!-- templates/home.html -->
+{% extends "layout.html" %}
+
+{% block title %}FruitGo - Trang chủ{% endblock %}
+
+{% block content %}
+
+<style>
+  .main-custom {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    align-items: stretch; /* Chỉnh chiều cao đồng đều */
+  }
+
+  .banner-container {
+    flex: 0 0 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .banner-container img {
+    width: 70%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .intro-container {
+    flex: 1;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2f6d32;
+    line-height: 1.7;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .intro-container h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+
+  .intro-container p,
+  .intro-container ul {
+    font-size: 1.15rem;
+    color: #4a6f3c;
+    margin-bottom: 30px;
+  }
+
+  .intro-container ul {
+    padding-left: 20px;
+  }
+
+  .intro-container li {
+    margin-bottom: 12px;
+  }
+
+  .intro-container strong {
+    color: #6BBF59;
+  }
+
+  .btn-search {
+    display: inline-block;
+    background-color: #81c784;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.2rem;
+    padding: 14px 32px;
+    border-radius: 14px;
+    box-shadow: 0 6px 14px rgba(129, 199, 132, 0.4);
+    text-decoration: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .btn-search:hover {
+    background-color: #66bb6a;
+    box-shadow: 0 8px 20px rgba(102, 187, 106, 0.6);
+  }
+
+  .text-center {
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  @media (max-width: 768px) {
+    .main-custom {
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .banner-container {
+      width: 100%;
+    }
+
+    .banner-container img {
+      height: auto;
+    }
+  }
+</style>
+
+<div class="main-custom">
+  <div class="banner-container">
+    {% if banner_url %}
+      <img src="{{ url_for('static', filename='images/icons/' + banner_url) }}" />
+    {% endif %}
+  </div>
+
+  <div class="intro-container">
+    <h2>Giới thiệu hệ thống</h2>
+    <p>
+      <strong>FruitGo</strong> là hệ thống giúp bạn dễ dàng nhận diện và tìm hiểu thông tin về các loại trái cây phổ biến tại Việt Nam.
+      Ứng dụng sử dụng trí tuệ nhân tạo (AI) để xử lý ảnh và ngôn ngữ tự nhiên nhằm mang đến trải nghiệm tìm kiếm tiện lợi và nhanh chóng.
+    </p>
+
+    <h2>Hướng dẫn sử dụng</h2>
+    <ul>
+      <li><strong>Tìm kiếm bằng từ khóa:</strong> Nhập tên hoặc đặc điểm của trái cây để tìm thông tin tương ứng.</li>
+      <li><strong>Tìm kiếm bằng ảnh:</strong> Tải lên ảnh trái cây, hệ thống sẽ tìm loại gần giống nhất.</li>
+    </ul>
+  </div>
+</div>
+
+{% endblock %}

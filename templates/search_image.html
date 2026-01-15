@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+
+{% block title %}Tìm kiếm bằng ảnh{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom:20px;">Tìm kiếm bằng ảnh</h2>
+
+<form action="{{ url_for('search_image') }}" method="POST" enctype="multipart/form-data" style="margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
+    <label for="image-upload" style="
+        padding: 10px 20px;
+        background-color: #81c784;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        box-shadow: 0 4px 8px rgba(129, 199, 132, 0.5);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        display: inline-block;
+        ">
+        Chọn ảnh
+    </label>
+    <input type="file" name="image" id="image-upload" accept="image/*" required
+           style="display:none;">
+    <button type="submit"
+            style="
+            padding: 10px 25px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.6);
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            ">
+        Tìm kiếm
+    </button>
+</form>
+
+<script>
+  // Hiển thị tên file đã chọn bên cạnh nút
+  const inputFile = document.getElementById('image-upload');
+  const label = inputFile.previousElementSibling;
+
+  inputFile.addEventListener('change', function() {
+    if (this.files && this.files.length > 0) {
+      label.textContent = this.files[0].name;
+    } else {
+      label.textContent = 'Chọn ảnh';
+    }
+  });
+</script>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class="messages" style="color:red; margin-bottom:20px;">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+{% if results %}
+    <h3>Kết quả tìm kiếm:</h3>
+    <div style="margin-top:20px; display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+        {% for item in results %}
+            <a href="/fruit/{{ item.payload.name }}" style="text-decoration:none;">
+                <div style="background:white; border-radius:12px; padding:15px; text-align:center;
+                            box-shadow:0 4px 8px rgba(0,0,0,0.1); transition: transform 0.2s ease;">
+                    <img src="{{ item.payload.image_url }}" alt="{{ item.payload.name }}"
+                         style="width:100%; height:150px; object-fit:cover; border-radius:8px;">
+                    <strong style="color:#2e7d32; font-size:1.1rem; display:block; margin-top:10px;">
+                        {{ item.payload.name }}
+                    </strong>
+                    <div style="color:#666; font-style:italic;">Điểm: {{ item.score|round(3) }}</div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% elif results is not none %}
+    <p style="margin-top:20px; color:#888;">Không tìm thấy kết quả phù hợp.</p>
+{% endif %}
+{% endblock %}
