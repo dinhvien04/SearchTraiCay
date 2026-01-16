@@ -1,40 +1,51 @@
 {% extends "layout.html" %}
 
-{% block title %}So sánh trái cây{% endblock %}
+{% block title %}So sánh trái cây - Orchard{% endblock %}
 
 {% block content %}
 <style>
+  .page-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .page-header h2 {
+    font-size: 2rem;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .page-header p {
+    color: var(--text-light);
+  }
+
   .compare-form {
-    background: #f9fdf7;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 30px;
+    background: var(--bg);
+    border-radius: 25px;
+    padding: 30px;
+    box-shadow: 
+      10px 10px 25px var(--shadow-dark),
+      -10px -10px 25px var(--shadow-light);
+    margin-bottom: 40px;
+  }
+
+  .form-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
+    gap: 20px;
     align-items: flex-end;
+    flex-wrap: wrap;
   }
 
-  .compare-form select {
-    padding: 12px;
-    border: 2px solid #81c784;
-    border-radius: 8px;
+  .form-group {
+    flex: 1;
     min-width: 200px;
-    font-size: 1rem;
   }
 
-  .compare-form button {
-    padding: 12px 30px;
-    background: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  .compare-form button:hover {
-    background: #388e3c;
+  .form-group label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--text);
+    font-weight: 500;
   }
 
   .compare-container {
@@ -44,47 +55,76 @@
   }
 
   .fruit-card {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    background: var(--bg);
+    border-radius: 25px;
+    padding: 30px;
+    box-shadow: 
+      10px 10px 25px var(--shadow-dark),
+      -10px -10px 25px var(--shadow-light);
   }
 
   .fruit-card img {
     width: 100%;
-    height: 200px;
+    height: 220px;
     object-fit: cover;
-    border-radius: 10px;
-    margin-bottom: 15px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    box-shadow: 
+      5px 5px 15px var(--shadow-dark),
+      -5px -5px 15px var(--shadow-light);
   }
 
   .fruit-card h3 {
-    color: #2e7d32;
+    color: var(--primary);
     font-size: 1.5rem;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     text-align: center;
   }
 
-  .fruit-card .info-row {
+  .info-row {
     display: flex;
-    padding: 10px 0;
-    border-bottom: 1px solid #e8f5e9;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
   }
 
-  .fruit-card .info-row:last-child {
+  .info-row:last-child {
     border-bottom: none;
   }
 
-  .fruit-card .label {
+  .info-label {
     font-weight: 600;
-    color: #388e3c;
+    color: var(--primary);
     width: 100px;
     flex-shrink: 0;
   }
 
-  .fruit-card .value {
-    color: #555;
+  .info-value {
+    color: var(--text-light);
     flex: 1;
+    line-height: 1.5;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px;
+    color: var(--text-light);
+  }
+
+  .empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+  }
+
+  .messages {
+    list-style: none;
+    margin-bottom: 20px;
+  }
+
+  .messages li {
+    background: #ffebee;
+    color: #c62828;
+    padding: 12px 20px;
+    border-radius: 10px;
   }
 
   @media (max-width: 768px) {
@@ -94,103 +134,109 @@
   }
 </style>
 
-<h2 style="margin-bottom: 20px;">So sánh trái cây</h2>
+<div class="page-header">
+  <h2>So sánh trái cây</h2>
+  <p>Chọn 2 loại trái cây để so sánh đặc điểm</p>
+</div>
 
 <form action="{{ url_for('compare_fruits') }}" method="POST" class="compare-form">
-    <div>
-        <label style="display: block; margin-bottom: 5px; color: #2e7d32; font-weight: 600;">Trái cây 1</label>
-        <select name="fruit1" required>
-            <option value="">-- Chọn trái cây --</option>
-            {% for name in fruit_names %}
-            <option value="{{ name }}" {% if fruit1 and fruit1.name == name %}selected{% endif %}>{{ name }}</option>
-            {% endfor %}
-        </select>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Trái cây 1</label>
+      <select name="fruit1" class="neu-select" style="width: 100%;" required>
+        <option value="">-- Chọn trái cây --</option>
+        {% for name in fruit_names %}
+        <option value="{{ name }}" {% if fruit1 and fruit1.name == name %}selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+      </select>
     </div>
     
-    <div>
-        <label style="display: block; margin-bottom: 5px; color: #2e7d32; font-weight: 600;">Trái cây 2</label>
-        <select name="fruit2" required>
-            <option value="">-- Chọn trái cây --</option>
-            {% for name in fruit_names %}
-            <option value="{{ name }}" {% if fruit2 and fruit2.name == name %}selected{% endif %}>{{ name }}</option>
-            {% endfor %}
-        </select>
+    <div class="form-group">
+      <label>Trái cây 2</label>
+      <select name="fruit2" class="neu-select" style="width: 100%;" required>
+        <option value="">-- Chọn trái cây --</option>
+        {% for name in fruit_names %}
+        <option value="{{ name }}" {% if fruit2 and fruit2.name == name %}selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+      </select>
     </div>
     
-    <button type="submit">So sánh</button>
+    <button type="submit" class="neu-btn neu-btn-primary">So sánh</button>
+  </div>
 </form>
 
 {% with messages = get_flashed_messages() %}
   {% if messages %}
-    <ul style="color:red; margin-bottom:20px;">
-      {% for message in messages %}
-        <li>{{ message }}</li>
-      {% endfor %}
+    <ul class="messages">
+      {% for message in messages %}<li>{{ message }}</li>{% endfor %}
     </ul>
   {% endif %}
 {% endwith %}
 
 {% if fruit1 and fruit2 %}
 <div class="compare-container">
-    <div class="fruit-card">
-        <img src="{{ fruit1.image_url }}" alt="{{ fruit1.name }}">
-        <h3>{{ fruit1.name }}</h3>
-        <div class="info-row">
-            <span class="label">Mô tả:</span>
-            <span class="value">{{ fruit1.description }}</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Loại:</span>
-            <span class="value">{{ fruit1.category }}</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Nguồn gốc:</span>
-            <span class="value">{{ fruit1.origin }}</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Màu sắc:</span>
-            <span class="value">{{ fruit1.color | join(", ") if fruit1.color else "N/A" }}</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Mùa vụ:</span>
-            <span class="value">{{ fruit1.season | join(", ") if fruit1.season else "N/A" }}</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Đặc điểm:</span>
-            <span class="value">{{ fruit1.keywords }}</span>
-        </div>
+  <div class="fruit-card">
+    <img src="{{ fruit1.image_url }}" alt="{{ fruit1.name }}">
+    <h3>{{ fruit1.name }}</h3>
+    <div class="info-row">
+      <span class="info-label">Mô tả</span>
+      <span class="info-value">{{ fruit1.description }}</span>
     </div>
-    
-    <div class="fruit-card">
-        <img src="{{ fruit2.image_url }}" alt="{{ fruit2.name }}">
-        <h3>{{ fruit2.name }}</h3>
-        <div class="info-row">
-            <span class="label">Mô tả:</span>
-            <span class="value">{{ fruit2.description }}</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Loại:</span>
-            <span class="value">{{ fruit2.category }}</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Nguồn gốc:</span>
-            <span class="value">{{ fruit2.origin }}</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Màu sắc:</span>
-            <span class="value">{{ fruit2.color | join(", ") if fruit2.color else "N/A" }}</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Mùa vụ:</span>
-            <span class="value">{{ fruit2.season | join(", ") if fruit2.season else "N/A" }}</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Đặc điểm:</span>
-            <span class="value">{{ fruit2.keywords }}</span>
-        </div>
+    <div class="info-row">
+      <span class="info-label">Loại</span>
+      <span class="info-value">{{ fruit1.category }}</span>
     </div>
+    <div class="info-row">
+      <span class="info-label">Nguồn gốc</span>
+      <span class="info-value">{{ fruit1.origin }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Màu sắc</span>
+      <span class="info-value">{{ fruit1.color | join(", ") if fruit1.color else "N/A" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Mùa vụ</span>
+      <span class="info-value">{{ fruit1.season | join(", ") if fruit1.season else "N/A" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Đặc điểm</span>
+      <span class="info-value">{{ fruit1.keywords }}</span>
+    </div>
+  </div>
+  
+  <div class="fruit-card">
+    <img src="{{ fruit2.image_url }}" alt="{{ fruit2.name }}">
+    <h3>{{ fruit2.name }}</h3>
+    <div class="info-row">
+      <span class="info-label">Mô tả</span>
+      <span class="info-value">{{ fruit2.description }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Loại</span>
+      <span class="info-value">{{ fruit2.category }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Nguồn gốc</span>
+      <span class="info-value">{{ fruit2.origin }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Màu sắc</span>
+      <span class="info-value">{{ fruit2.color | join(", ") if fruit2.color else "N/A" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Mùa vụ</span>
+      <span class="info-value">{{ fruit2.season | join(", ") if fruit2.season else "N/A" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Đặc điểm</span>
+      <span class="info-value">{{ fruit2.keywords }}</span>
+    </div>
+  </div>
 </div>
 {% else %}
-<p style="color: #666; text-align: center; margin-top: 30px;">Chọn 2 loại trái cây để so sánh.</p>
+<div class="empty-state">
+  <div class="empty-state-icon"></div>
+  <p>Chọn 2 loại trái cây để bắt đầu so sánh</p>
+</div>
 {% endif %}
 {% endblock %}

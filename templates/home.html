@@ -1,128 +1,185 @@
-<!-- templates/home.html -->
 {% extends "layout.html" %}
 
-{% block title %}FruitGo - Trang chủ{% endblock %}
+{% block title %}Orchard - Trang chủ{% endblock %}
 
 {% block content %}
-
 <style>
-  .main-custom {
+  .hero {
     display: flex;
-    gap: 20px;
-    width: 100%;
-    box-sizing: border-box;
-    align-items: stretch; /* Chỉnh chiều cao đồng đều */
-  }
-
-  .banner-container {
-    flex: 0 0 500px;
-    display: flex;
+    gap: 50px;
     align-items: center;
-    justify-content: center;
+    margin-bottom: 50px;
   }
 
-  .banner-container img {
-    width: 70%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-
-  .intro-container {
+  .hero-content {
     flex: 1;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #2f6d32;
-    line-height: 1.7;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
   }
 
-  .intro-container h2 {
-    font-size: 2rem;
+  .hero-content h1 {
+    font-size: 2.8rem;
     font-weight: 700;
+    color: var(--primary);
     margin-bottom: 20px;
-    letter-spacing: 1px;
+    line-height: 1.2;
   }
 
-  .intro-container p,
-  .intro-container ul {
-    font-size: 1.15rem;
-    color: #4a6f3c;
+  .hero-content h1 span {
+    color: var(--text);
+  }
+
+  .hero-content p {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    line-height: 1.8;
     margin-bottom: 30px;
   }
 
-  .intro-container ul {
-    padding-left: 20px;
+  .hero-buttons {
+    display: flex;
+    gap: 15px;
   }
 
-  .intro-container li {
-    margin-bottom: 12px;
+  .hero-image {
+    flex: 0 0 350px;
   }
 
-  .intro-container strong {
-    color: #6BBF59;
+  .hero-image-wrapper {
+    background: var(--bg);
+    border-radius: 30px;
+    padding: 20px;
+    box-shadow: 
+      15px 15px 35px var(--shadow-dark),
+      -15px -15px 35px var(--shadow-light);
   }
 
-  .btn-search {
-    display: inline-block;
-    background-color: #81c784;
-    color: #fff;
-    font-weight: 600;
+  .hero-image-wrapper img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 20px;
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+  }
+
+  .feature-card {
+    background: var(--bg);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 
+      8px 8px 20px var(--shadow-dark),
+      -8px -8px 20px var(--shadow-light);
+    transition: transform 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .feature-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(145deg, #6ba578, #4e8a5a);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    box-shadow: 
+      4px 4px 10px var(--shadow-dark),
+      -4px -4px 10px var(--shadow-light);
+  }
+
+  .feature-card h3 {
     font-size: 1.2rem;
-    padding: 14px 32px;
-    border-radius: 14px;
-    box-shadow: 0 6px 14px rgba(129, 199, 132, 0.4);
-    text-decoration: none;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    color: var(--text);
+    margin-bottom: 12px;
+    font-weight: 600;
   }
 
-  .btn-search:hover {
-    background-color: #66bb6a;
-    box-shadow: 0 8px 20px rgba(102, 187, 106, 0.6);
+  .feature-card p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    line-height: 1.6;
   }
 
-  .text-center {
-    text-align: center;
-    margin-top: 40px;
-  }
-
-  @media (max-width: 768px) {
-    .main-custom {
-      flex-direction: column;
-      padding: 20px;
+  @media (max-width: 900px) {
+    .hero {
+      flex-direction: column-reverse;
+      text-align: center;
     }
 
-    .banner-container {
+    .hero-image {
+      flex: none;
       width: 100%;
+      max-width: 300px;
     }
 
-    .banner-container img {
-      height: auto;
+    .hero-buttons {
+      justify-content: center;
+    }
+
+    .hero-content h1 {
+      font-size: 2.2rem;
     }
   }
 </style>
 
-<div class="main-custom">
-  <div class="banner-container">
-    {% if banner_url %}
-      <img src="{{ url_for('static', filename='images/icons/' + banner_url) }}" />
-    {% endif %}
-  </div>
-
-  <div class="intro-container">
-    <h2>Giới thiệu hệ thống</h2>
+<div class="hero">
+  <div class="hero-content">
+    <h1>Khám phá <span>Trái cây</span><br>Việt Nam</h1>
     <p>
-      <strong>FruitGo</strong> là hệ thống giúp bạn dễ dàng nhận diện và tìm hiểu thông tin về các loại trái cây phổ biến tại Việt Nam.
-      Ứng dụng sử dụng trí tuệ nhân tạo (AI) để xử lý ảnh và ngôn ngữ tự nhiên nhằm mang đến trải nghiệm tìm kiếm tiện lợi và nhanh chóng.
+      Orchard là hệ thống thông minh giúp bạn nhận diện và tìm hiểu về các loại trái cây Việt Nam. 
+      Sử dụng AI để tìm kiếm bằng hình ảnh hoặc mô tả, mang đến trải nghiệm nhanh chóng và chính xác.
     </p>
-
-    <h2>Hướng dẫn sử dụng</h2>
-    <ul>
-      <li><strong>Tìm kiếm bằng từ khóa:</strong> Nhập tên hoặc đặc điểm của trái cây để tìm thông tin tương ứng.</li>
-      <li><strong>Tìm kiếm bằng ảnh:</strong> Tải lên ảnh trái cây, hệ thống sẽ tìm loại gần giống nhất.</li>
-    </ul>
+    <div class="hero-buttons">
+      <a href="/search-text" class="neu-btn neu-btn-primary">Bắt đầu tìm kiếm</a>
+      <a href="/search-image" class="neu-btn">Tìm bằng ảnh</a>
+    </div>
+  </div>
+  
+  <div class="hero-image">
+    <div class="hero-image-wrapper">
+      {% if banner_url %}
+        <img src="{{ url_for('static', filename='images/icons/' + banner_url) }}" alt="Trái cây" />
+      {% else %}
+        <img src="https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=400" alt="Trái cây" />
+      {% endif %}
+    </div>
   </div>
 </div>
 
+<h2 style="text-align: center; color: var(--text); margin-bottom: 10px; font-size: 1.8rem;">Tính năng nổi bật</h2>
+<p style="text-align: center; color: var(--text-light); margin-bottom: 30px;">Những gì Orchard có thể làm cho bạn</p>
+
+<div class="features">
+  <div class="feature-card">
+    <div class="feature-icon">1</div>
+    <h3>Tìm kiếm thông minh</h3>
+    <p>Nhập tên, đặc điểm hoặc mô tả trái cây. Hệ thống AI sẽ tìm kết quả phù hợp nhất cho bạn.</p>
+  </div>
+  
+  <div class="feature-card">
+    <div class="feature-icon">2</div>
+    <h3>Nhận diện bằng ảnh</h3>
+    <p>Chụp hoặc tải ảnh trái cây lên, Orchard sẽ nhận diện và hiển thị thông tin chi tiết.</p>
+  </div>
+  
+  <div class="feature-card">
+    <div class="feature-icon">3</div>
+    <h3>So sánh trái cây</h3>
+    <p>So sánh đặc điểm, nguồn gốc, mùa vụ giữa các loại trái cây một cách trực quan.</p>
+  </div>
+  
+  <div class="feature-card">
+    <div class="feature-icon">4</div>
+    <h3>Chatbot hỗ trợ</h3>
+    <p>Hỏi đáp trực tiếp với AI về mọi thông tin liên quan đến trái cây Việt Nam.</p>
+  </div>
+</div>
 {% endblock %}

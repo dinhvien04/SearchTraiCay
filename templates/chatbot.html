@@ -1,231 +1,257 @@
 {% extends "layout.html" %}
 
-{% block title %}Chatbot - Hỏi đáp về trái cây{% endblock %}
+{% block title %}Chatbot - Orchard{% endblock %}
 
 {% block content %}
 <style>
-    .chat-container {
-        max-width: 800px;
-        margin: 0 auto;
-        background: #f9fdf7;
-        border-radius: 15px;
-        box-shadow: 0 8px 25px rgba(46, 125, 50, 0.15);
-        overflow: hidden;
-    }
-    
-    .chat-header {
-        background: linear-gradient(135deg, #4caf50, #81c784);
-        color: white;
-        padding: 20px;
-        text-align: center;
-    }
-    
-    .chat-header h2 {
-        margin: 0;
-        font-size: 1.5rem;
-    }
-    
-    .chat-header p {
-        margin: 5px 0 0;
-        opacity: 0.9;
-        font-size: 0.9rem;
-    }
-    
-    .chat-messages {
-        height: 450px;
-        overflow-y: auto;
-        padding: 20px;
-        background: white;
-    }
-    
-    .message {
-        margin-bottom: 15px;
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    
-    .message.user {
-        flex-direction: row-reverse;
-    }
-    
-    .message-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        flex-shrink: 0;
-    }
-    
-    .message.bot .message-avatar {
-        background: #e8f5e9;
-    }
-    
-    .message.user .message-avatar {
-        background: #fff3e0;
-    }
-    
-    .message-content {
-        max-width: 70%;
-        padding: 12px 16px;
-        border-radius: 15px;
-        line-height: 1.5;
-    }
-    
-    .message.bot .message-content {
-        background: #f1f8e9;
-        color: #2e7d32;
-        border-bottom-left-radius: 5px;
-    }
-    
-    .message.user .message-content {
-        background: #4caf50;
-        color: white;
-        border-bottom-right-radius: 5px;
-    }
-    
-    .chat-input-container {
-        padding: 15px 20px;
-        background: #f5f5f5;
-        border-top: 1px solid #e0e0e0;
-        display: flex;
-        gap: 10px;
-    }
-    
-    .chat-input {
-        flex: 1;
-        padding: 12px 15px;
-        border: 2px solid #81c784;
-        border-radius: 25px;
-        font-size: 1rem;
-        outline: none;
-        transition: border-color 0.3s;
-    }
-    
-    .chat-input:focus {
-        border-color: #4caf50;
-    }
-    
-    .chat-send-btn {
-        padding: 12px 25px;
-        background: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 25px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.3s;
-    }
-    
-    .chat-send-btn:hover {
-        background: #388e3c;
-    }
-    
-    .chat-send-btn:disabled {
-        background: #a5d6a7;
-        cursor: not-allowed;
-    }
-    
-    .suggestions {
-        padding: 15px 20px;
-        background: #fafafa;
-        border-top: 1px solid #e0e0e0;
-    }
-    
-    .suggestions p {
-        margin: 0 0 10px;
-        color: #666;
-        font-size: 0.9rem;
-    }
-    
-    .suggestion-chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    
-    .suggestion-chip {
-        padding: 8px 15px;
-        background: white;
-        border: 1px solid #81c784;
-        border-radius: 20px;
-        color: #2e7d32;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    
-    .suggestion-chip:hover {
-        background: #e8f5e9;
-        border-color: #4caf50;
-    }
-    
-    .typing-indicator {
-        display: flex;
-        gap: 5px;
-        padding: 10px;
-    }
-    
-    .typing-indicator span {
-        width: 8px;
-        height: 8px;
-        background: #81c784;
-        border-radius: 50%;
-        animation: typing 1s infinite;
-    }
-    
-    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-    
-    @keyframes typing {
-        0%, 100% { opacity: 0.3; transform: scale(0.8); }
-        50% { opacity: 1; transform: scale(1); }
-    }
-    
-    .message-content strong {
-        color: #1b5e20;
-    }
+  .chat-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .chat-container {
+    background: var(--bg);
+    border-radius: 30px;
+    box-shadow: 
+      15px 15px 35px var(--shadow-dark),
+      -15px -15px 35px var(--shadow-light);
+    overflow: hidden;
+  }
+
+  .chat-header {
+    background: linear-gradient(145deg, #6ba578, #4e8a5a);
+    color: white;
+    padding: 25px;
+    text-align: center;
+  }
+
+  .chat-header h2 {
+    margin: 0 0 5px 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  .chat-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+  }
+
+  .chat-messages {
+    height: 420px;
+    overflow-y: auto;
+    padding: 25px;
+    background: var(--bg);
+  }
+
+  .message {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .message.user {
+    flex-direction: row-reverse;
+  }
+
+  .message-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    box-shadow: 
+      3px 3px 8px var(--shadow-dark),
+      -3px -3px 8px var(--shadow-light);
+  }
+
+  .message.bot .message-avatar {
+    background: linear-gradient(145deg, #6ba578, #4e8a5a);
+  }
+
+  .message.user .message-avatar {
+    background: linear-gradient(145deg, #ff9800, #f57c00);
+  }
+
+  .message-content {
+    max-width: 70%;
+    padding: 15px 20px;
+    border-radius: 18px;
+    line-height: 1.6;
+    box-shadow: 
+      4px 4px 10px var(--shadow-dark),
+      -4px -4px 10px var(--shadow-light);
+  }
+
+  .message.bot .message-content {
+    background: var(--bg);
+    color: var(--text);
+    border-bottom-left-radius: 5px;
+  }
+
+  .message.user .message-content {
+    background: linear-gradient(145deg, #6ba578, #4e8a5a);
+    color: white;
+    border-bottom-right-radius: 5px;
+  }
+
+  .suggestions {
+    padding: 20px 25px;
+    background: var(--bg);
+    border-top: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .suggestions p {
+    margin: 0 0 12px;
+    color: var(--text-light);
+    font-size: 0.85rem;
+  }
+
+  .suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .suggestion-chip {
+    padding: 10px 18px;
+    background: var(--bg);
+    border: none;
+    border-radius: 20px;
+    color: var(--text);
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    box-shadow: 
+      3px 3px 8px var(--shadow-dark),
+      -3px -3px 8px var(--shadow-light);
+    transition: all 0.3s ease;
+  }
+
+  .suggestion-chip:hover {
+    box-shadow: 
+      inset 2px 2px 5px var(--shadow-dark),
+      inset -2px -2px 5px var(--shadow-light);
+    color: var(--primary);
+  }
+
+  .chat-input-container {
+    padding: 20px 25px;
+    background: var(--bg);
+    display: flex;
+    gap: 12px;
+  }
+
+  .chat-input {
+    flex: 1;
+    padding: 15px 22px;
+    background: var(--bg);
+    border: none;
+    border-radius: 25px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    color: var(--text);
+    box-shadow: 
+      inset 4px 4px 10px var(--shadow-dark),
+      inset -4px -4px 10px var(--shadow-light);
+    outline: none;
+  }
+
+  .chat-input::placeholder {
+    color: var(--text-light);
+  }
+
+  .chat-send-btn {
+    padding: 15px 28px;
+    background: linear-gradient(145deg, #6ba578, #4e8a5a);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    box-shadow: 
+      4px 4px 10px var(--shadow-dark),
+      -4px -4px 10px var(--shadow-light);
+    transition: all 0.3s ease;
+  }
+
+  .chat-send-btn:hover {
+    background: linear-gradient(145deg, #5a9367, #458050);
+  }
+
+  .chat-send-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .typing-indicator {
+    display: flex;
+    gap: 5px;
+    padding: 8px;
+  }
+
+  .typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: typing 1s infinite;
+  }
+
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  .message-content strong {
+    color: var(--primary);
+  }
 </style>
 
-<div class="chat-container">
+<div class="chat-wrapper">
+  <div class="chat-container">
     <div class="chat-header">
-        <h2> FruitGo Chatbot</h2>
-        <p>Hỏi đáp về trái cây Việt Nam</p>
+      <h2>Orchard Chatbot</h2>
+      <p>Hỏi đáp về trái cây Việt Nam</p>
     </div>
     
     <div class="chat-messages" id="chatMessages">
-        <div class="message bot">
-            <div class="message-avatar"></div>
-            <div class="message-content">
-                Xin chào! Tôi là trợ lý FruitGo <br><br>
-                Bạn có thể hỏi tôi về:<br>
-                • Thông tin các loại trái cây<br>
-                • Trái cây theo mùa, vùng miền<br>
-                • Trái cây tốt cho sức khỏe<br>
-                • Và nhiều hơn nữa!
-            </div>
+      <div class="message bot">
+        <div class="message-avatar">Bot</div>
+        <div class="message-content">
+          Xin chào! Tôi là trợ lý Orchard<br><br>
+          Bạn có thể hỏi tôi về:<br>
+          • Thông tin các loại trái cây<br>
+          • Trái cây theo mùa, vùng miền<br>
+          • Trái cây tốt cho sức khỏe
         </div>
+      </div>
     </div>
     
     <div class="suggestions">
-        <p> Gợi ý câu hỏi:</p>
-        <div class="suggestion-chips">
-            <span class="suggestion-chip" onclick="askQuestion(this.textContent)">Trái cây nào giàu vitamin C?</span>
-            <span class="suggestion-chip" onclick="askQuestion(this.textContent)">Trái cây mùa hè có gì?</span>
-            <span class="suggestion-chip" onclick="askQuestion(this.textContent)">Trái cây miền Tây</span>
-            <span class="suggestion-chip" onclick="askQuestion(this.textContent)">Trái cây ngọt béo</span>
-            <span class="suggestion-chip" onclick="askQuestion(this.textContent)">Trái cây giảm cân</span>
-        </div>
+      <p>Gợi ý câu hỏi:</p>
+      <div class="suggestion-chips">
+        <button class="suggestion-chip" onclick="askQuestion(this.textContent)">Trái cây giàu vitamin C?</button>
+        <button class="suggestion-chip" onclick="askQuestion(this.textContent)">Trái cây mùa hè?</button>
+        <button class="suggestion-chip" onclick="askQuestion(this.textContent)">Trái cây miền Tây</button>
+        <button class="suggestion-chip" onclick="askQuestion(this.textContent)">Trái cây giảm cân</button>
+      </div>
     </div>
     
     <div class="chat-input-container">
-        <input type="text" class="chat-input" id="chatInput" placeholder="Nhập câu hỏi về trái cây..." 
-               onkeypress="if(event.key === 'Enter') sendMessage()">
-        <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">Gửi</button>
+      <input type="text" class="chat-input" id="chatInput" placeholder="Nhập câu hỏi..." 
+             onkeypress="if(event.key === 'Enter') sendMessage()">
+      <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">Gửi</button>
     </div>
+  </div>
 </div>
 
 <script>
@@ -234,78 +260,63 @@ const chatInput = document.getElementById('chatInput');
 const sendBtn = document.getElementById('sendBtn');
 
 function addMessage(content, isUser = false) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-    
-    const avatar = document.createElement('div');
-    avatar.className = 'message-avatar';
-    avatar.textContent = isUser ? '' : '';
-    
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'message-content';
-    contentDiv.innerHTML = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-    
-    messageDiv.appendChild(avatar);
-    messageDiv.appendChild(contentDiv);
-    chatMessages.appendChild(messageDiv);
-    
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+  const div = document.createElement('div');
+  div.className = `message ${isUser ? 'user' : 'bot'}`;
+  div.innerHTML = `
+    <div class="message-avatar">${isUser ? 'You' : 'Bot'}</div>
+    <div class="message-content">${content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</div>
+  `;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 function showTyping() {
-    const typingDiv = document.createElement('div');
-    typingDiv.className = 'message bot';
-    typingDiv.id = 'typingIndicator';
-    typingDiv.innerHTML = `
-        <div class="message-avatar">🤖</div>
-        <div class="message-content">
-            <div class="typing-indicator">
-                <span></span><span></span><span></span>
-            </div>
-        </div>
-    `;
-    chatMessages.appendChild(typingDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+  const div = document.createElement('div');
+  div.className = 'message bot';
+  div.id = 'typingIndicator';
+  div.innerHTML = `
+    <div class="message-avatar">Bot</div>
+    <div class="message-content"><div class="typing-indicator"><span></span><span></span><span></span></div></div>
+  `;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 function hideTyping() {
-    const typing = document.getElementById('typingIndicator');
-    if (typing) typing.remove();
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
 }
 
 async function sendMessage() {
-    const message = chatInput.value.trim();
-    if (!message) return;
-    
-    addMessage(message, true);
-    chatInput.value = '';
-    sendBtn.disabled = true;
-    
-    showTyping();
-    
-    try {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message })
-        });
-        
-        const data = await response.json();
-        hideTyping();
-        addMessage(data.response);
-        
-    } catch (error) {
-        hideTyping();
-        addMessage('Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!');
-    }
-    
-    sendBtn.disabled = false;
-    chatInput.focus();
+  const message = chatInput.value.trim();
+  if (!message) return;
+  
+  addMessage(message, true);
+  chatInput.value = '';
+  sendBtn.disabled = true;
+  showTyping();
+  
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+    const data = await res.json();
+    hideTyping();
+    addMessage(data.response);
+  } catch (e) {
+    hideTyping();
+    addMessage('Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!');
+  }
+  
+  sendBtn.disabled = false;
+  chatInput.focus();
 }
 
-function askQuestion(question) {
-    chatInput.value = question;
-    sendMessage();
+function askQuestion(q) {
+  chatInput.value = q;
+  sendMessage();
 }
 </script>
 {% endblock %}

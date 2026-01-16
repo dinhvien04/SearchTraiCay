@@ -1,156 +1,219 @@
 {% extends "layout.html" %}
+
+{% block title %}{{ fruit.name if fruit else 'Chi tiết' }} - Orchard{% endblock %}
+
 {% block content %}
 {% if fruit %}
 <style>
-  .fruit-container {
+  .fruit-detail {
+    background: var(--bg);
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 
+      15px 15px 35px var(--shadow-dark),
+      -15px -15px 35px var(--shadow-light);
     display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-    background: #f9fdf7;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(46, 125, 50, 0.15);
-    max-width: 1000px;
-    margin: 0 auto 40px auto;
+    gap: 40px;
+    margin-bottom: 50px;
+  }
+
+  .fruit-image-wrapper {
+    flex: 0 0 350px;
   }
 
   .fruit-image {
-    flex: 1 1 320px;
-    max-width: 320px;
-    border-radius: 15px;
-    box-shadow: 0 8px 15px rgba(46, 125, 50, 0.3);
+    width: 100%;
+    height: 350px;
     object-fit: cover;
+    border-radius: 25px;
+    box-shadow: 
+      8px 8px 20px var(--shadow-dark),
+      -8px -8px 20px var(--shadow-light);
     transition: transform 0.3s ease;
   }
 
   .fruit-image:hover {
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
 
   .fruit-info {
-    flex: 2 1 500px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #2e7d32;
+    flex: 1;
   }
 
   .fruit-info h2 {
-    font-size: 2.4rem;
+    font-size: 2.2rem;
+    color: var(--primary);
     margin-bottom: 20px;
-    font-weight: 700;
-    border-bottom: 3px solid #81c784;
-    padding-bottom: 8px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid var(--primary-light);
   }
 
-  .fruit-info p {
-    font-size: 1.15rem;
-    line-height: 1.6;
-    margin: 12px 0;
+  .fruit-description {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    line-height: 1.8;
+    margin-bottom: 25px;
   }
 
-  .fruit-info p strong {
-    color: #388e3c;
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .info-item {
+    background: var(--bg);
+    padding: 18px;
+    border-radius: 15px;
+    box-shadow: 
+      inset 3px 3px 8px var(--shadow-dark),
+      inset -3px -3px 8px var(--shadow-light);
+  }
+
+  .info-item .label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 5px;
+  }
+
+  .info-item .value {
+    font-weight: 600;
+    color: var(--text);
   }
 
   .similar-section {
-    max-width: 1000px;
-    margin: 40px auto;
+    margin-top: 20px;
   }
 
   .similar-section h3 {
-    color: #2e7d32;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
+    color: var(--text);
+    font-size: 1.4rem;
+    margin-bottom: 25px;
   }
 
   .similar-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 15px;
+    gap: 20px;
   }
 
   .similar-card {
-    background: white;
-    border-radius: 12px;
-    padding: 12px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    transition: transform 0.2s ease;
+    background: var(--bg);
+    border-radius: 18px;
+    padding: 18px;
     text-decoration: none;
+    text-align: center;
+    box-shadow: 
+      6px 6px 15px var(--shadow-dark),
+      -6px -6px 15px var(--shadow-light);
+    transition: all 0.3s ease;
   }
 
   .similar-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
   }
 
   .similar-card img {
     width: 100%;
     height: 120px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 12px;
+    margin-bottom: 12px;
   }
 
   .similar-card .name {
-    color: #2e7d32;
+    color: var(--text);
     font-weight: 600;
-    margin-top: 8px;
     font-size: 0.95rem;
   }
 
   .similar-card .score {
-    color: #888;
+    color: var(--text-light);
     font-size: 0.8rem;
-    margin-top: 4px;
+    margin-top: 5px;
   }
-  
-  @media (max-width: 700px) {
-    .fruit-container {
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 25px;
+    text-decoration: none;
+  }
+
+  @media (max-width: 800px) {
+    .fruit-detail {
       flex-direction: column;
-      padding: 20px;
-      max-width: 100%;
+      padding: 25px;
     }
-    .fruit-image, .fruit-info {
-      max-width: 100%;
+
+    .fruit-image-wrapper {
       flex: none;
     }
-    .fruit-image {
-      margin-bottom: 20px;
+
+    .info-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>
 
-<div class="fruit-container">
-    {% if fruit.image_url %}
-    <img src="{{ fruit.image_url }}" alt="{{ fruit.name }}" class="fruit-image" />
-    {% endif %}
-    <div class="fruit-info">
-        <h2>{{ fruit.name }}</h2>
-        <p>{{ fruit.description }}</p>
+<a href="/search-text" class="back-btn neu-btn">← Quay lại</a>
 
-        <p><strong>Đặc điểm:</strong> {{ fruit.keywords }}</p>
-        <p><strong>Loại trái cây:</strong> {{ fruit.category }}</p>
-        <p><strong>Nguồn gốc:</strong> {{ fruit.origin }}</p>
-        <p><strong>Màu sắc phổ biến:</strong> {{ fruit.color | join(", ") if fruit.color else "" }}</p>
-        <p><strong>Mùa vụ:</strong> {{ fruit.season | join(", ") if fruit.season else "" }}</p>
+<div class="fruit-detail">
+  {% if fruit.image_url %}
+  <div class="fruit-image-wrapper">
+    <img src="{{ fruit.image_url }}" alt="{{ fruit.name }}" class="fruit-image">
+  </div>
+  {% endif %}
+  
+  <div class="fruit-info">
+    <h2>{{ fruit.name }}</h2>
+    <p class="fruit-description">{{ fruit.description }}</p>
+    
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="label">Loại trái cây</div>
+        <div class="value">{{ fruit.category }}</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Nguồn gốc</div>
+        <div class="value">{{ fruit.origin }}</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Màu sắc</div>
+        <div class="value">{{ fruit.color | join(", ") if fruit.color else "N/A" }}</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Mùa vụ</div>
+        <div class="value">{{ fruit.season | join(", ") if fruit.season else "N/A" }}</div>
+      </div>
+      <div class="info-item" style="grid-column: span 2;">
+        <div class="label">Đặc điểm</div>
+        <div class="value">{{ fruit.keywords }}</div>
+      </div>
     </div>
+  </div>
 </div>
 
 {% if similar_fruits %}
 <div class="similar-section">
-    <h3>Trái cây tương tự</h3>
-    <div class="similar-grid">
-        {% for item in similar_fruits %}
-        <a href="/fruit/{{ item.payload.name }}" class="similar-card">
-            <img src="{{ item.payload.image_url }}" alt="{{ item.payload.name }}">
-            <div class="name">{{ item.payload.name }}</div>
-            <div class="score">Độ tương đồng: {{ (item.score * 100)|round(1) }}%</div>
-        </a>
-        {% endfor %}
-    </div>
+  <h3>Trái cây tương tự</h3>
+  <div class="similar-grid">
+    {% for item in similar_fruits %}
+    <a href="/fruit/{{ item.payload.name }}" class="similar-card">
+      <img src="{{ item.payload.image_url }}" alt="{{ item.payload.name }}">
+      <div class="name">{{ item.payload.name }}</div>
+      <div class="score">Tương đồng: {{ (item.score * 100)|round(1) }}%</div>
+    </a>
+    {% endfor %}
+  </div>
 </div>
 {% endif %}
 
 {% else %}
-<p style="text-align:center; font-size:1.3rem; color:#666; margin-top:40px;">Không có dữ liệu trái cây để hiển thị.</p>
+<div style="text-align: center; padding: 60px; color: var(--text-light);">
+  <div style="font-size: 2rem; margin-bottom: 20px;"></div>
+  <p>Không có dữ liệu trái cây để hiển thị</p>
+</div>
 {% endif %}
 {% endblock %}

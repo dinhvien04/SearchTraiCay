@@ -3,118 +3,230 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% block title %}FruitGo{% endblock %}</title>
+  <title>{% block title %}Orchard{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Reset & font */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body {
-      background-color: #ffffff;
-      color: #1b5e20;
+      font-family: 'Poppins', sans-serif;
+      background: #e8f0e8;
+      color: #2d4a3e;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      font-size: 16px;
+    }
+
+    /* Neumorphism variables */
+    :root {
+      --bg: #e8f0e8;
+      --shadow-light: #ffffff;
+      --shadow-dark: #c5cec5;
+      --primary: #5a9367;
+      --primary-light: #7ab587;
+      --text: #2d4a3e;
+      --text-light: #5a7d6a;
     }
 
     header {
-      background-color: #4caf50;
-      padding: 20px 40px;
+      background: var(--bg);
+      padding: 20px 50px;
       display: flex;
-      justify-content: flex-start;
+      justify-content: space-between;
       align-items: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-      color: #e8f5e9;
-      gap: 25px;
-      width: 100%;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     }
 
-        header h1 {
-      font-size: 2rem;
-      font-weight: 900;       /* in đậm hơn */
-      font-style: italic;     /* chữ nghiêng */
-      letter-spacing: 1.5px;
-      cursor: default;
-      margin-right: 10px;
-      color: #e7ffce;         /* màu xanh lá tươi sáng, dịu mắt hơn */
-      font-family: 'Georgia', serif;  /* font chữ serif đẹp, sang trọng */
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* bóng mờ nhẹ làm nổi bật chữ */
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 2px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(145deg, #6ba578, #4e8a5a);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 
+        4px 4px 10px var(--shadow-dark),
+        -4px -4px 10px var(--shadow-light);
     }
 
     nav {
       display: flex;
-      gap: 15px;
+      gap: 12px;
     }
 
     nav a {
-      background-color: #ffffff;
-      color: #388e3c;
-      font-weight: 600;
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 500;
+      font-size: 0.9rem;
       text-decoration: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(56, 142, 60, 0.3);
-      transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-      display: flex;
-      align-items: center;
-      user-select: none;
+      padding: 12px 22px;
+      border-radius: 12px;
+      box-shadow: 
+        5px 5px 15px var(--shadow-dark),
+        -5px -5px 15px var(--shadow-light);
+      transition: all 0.3s ease;
     }
 
-    nav a:hover,
-    nav a:focus {
-      background-color: #81c784;
-      color: #1b5e20;
-      transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(56, 142, 60, 0.6);
-      outline: none;
+    nav a:hover {
+      box-shadow: 
+        inset 3px 3px 8px var(--shadow-dark),
+        inset -3px -3px 8px var(--shadow-light);
+      color: var(--primary);
     }
 
     main {
       flex-grow: 1;
       width: 100%;
-      color: #1b5e20;
-      /* Không padding trực tiếp ở main */
     }
 
     .container {
-      max-width: calc(100% - 200px); /* 100px mỗi bên */
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 40px 0;
-      box-sizing: border-box;
-      min-height: 100%;
+      padding: 40px 30px;
     }
 
     footer {
-      background-color: #4caf50;
+      background: var(--bg);
       text-align: center;
-      padding: 15px 10px;
-      color: #e8f5e9;
-      font-size: 0.9rem;
-      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
+      padding: 20px;
+      color: var(--text-light);
+      font-size: 0.85rem;
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.03);
+    }
+
+    /* Neumorphic utilities */
+    .neu-card {
+      background: var(--bg);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 
+        8px 8px 20px var(--shadow-dark),
+        -8px -8px 20px var(--shadow-light);
+    }
+
+    .neu-inset {
+      background: var(--bg);
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 
+        inset 4px 4px 10px var(--shadow-dark),
+        inset -4px -4px 10px var(--shadow-light);
+    }
+
+    .neu-btn {
+      background: var(--bg);
+      border: none;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      box-shadow: 
+        5px 5px 15px var(--shadow-dark),
+        -5px -5px 15px var(--shadow-light);
+      transition: all 0.3s ease;
+    }
+
+    .neu-btn:hover {
+      box-shadow: 
+        inset 3px 3px 8px var(--shadow-dark),
+        inset -3px -3px 8px var(--shadow-light);
+    }
+
+    .neu-btn-primary {
+      background: linear-gradient(145deg, #6ba578, #4e8a5a);
+      color: white;
+      box-shadow: 
+        5px 5px 15px var(--shadow-dark),
+        -5px -5px 15px var(--shadow-light);
+    }
+
+    .neu-btn-primary:hover {
+      background: linear-gradient(145deg, #5a9367, #458050);
+      box-shadow: 
+        3px 3px 10px var(--shadow-dark),
+        -3px -3px 10px var(--shadow-light);
+    }
+
+    .neu-input {
+      background: var(--bg);
+      border: none;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      color: var(--text);
+      box-shadow: 
+        inset 4px 4px 10px var(--shadow-dark),
+        inset -4px -4px 10px var(--shadow-light);
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .neu-input:focus {
+      box-shadow: 
+        inset 5px 5px 12px var(--shadow-dark),
+        inset -5px -5px 12px var(--shadow-light);
+    }
+
+    .neu-input::placeholder {
+      color: var(--text-light);
+    }
+
+    .neu-select {
+      background: var(--bg);
+      border: none;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      color: var(--text);
+      box-shadow: 
+        inset 4px 4px 10px var(--shadow-dark),
+        inset -4px -4px 10px var(--shadow-light);
+      outline: none;
+      cursor: pointer;
     }
 
     @media (max-width: 768px) {
       header {
         flex-direction: column;
-        align-items: flex-start;
         padding: 20px;
-        gap: 15px;
+        gap: 20px;
       }
 
       nav {
         flex-wrap: wrap;
+        justify-content: center;
         gap: 10px;
       }
 
+      nav a {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+      }
+
       .container {
-        max-width: 100%;
-        padding: 20px;
+        padding: 25px 15px;
       }
     }
   </style>
@@ -122,12 +234,15 @@
 
 <body>
   <header>
-    <h1>FruitGo</h1>
+    <a href="/" class="logo">
+      <span class="logo-icon">O</span>
+      Orchard
+    </a>
     <nav>
-      <a href="/search-text">Tìm kiếm bằng từ khóa</a>
-      <a href="/search-image">Tìm kiếm bằng ảnh</a>
-      <a href="/compare">So sánh trái cây</a>
-      <a href="/chatbot"> Chatbot</a>
+      <a href="/search-text">Tìm từ khóa</a>
+      <a href="/search-image">Tìm bằng ảnh</a>
+      <a href="/compare">So sánh</a>
+      <a href="/chatbot">Chatbot</a>
     </nav>
   </header>
 
@@ -138,7 +253,7 @@
   </main>
 
   <footer>
-    &copy; 2025 FruitGo. Mọi quyền được bảo lưu.
+    © 2025 Orchard. Khám phá thế giới trái cây Việt Nam.
   </footer>
 </body>
 </html>

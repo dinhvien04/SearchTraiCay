@@ -1,72 +1,291 @@
 {% extends "layout.html" %}
 
-{% block title %}Tìm kiếm theo từ khóa{% endblock %}
+{% block title %}Tìm kiếm theo từ khóa - Orchard{% endblock %}
 
 {% block content %}
-<h2 style="margin-bottom:20px;">Tìm kiếm bằng từ khóa / Mô tả</h2>
+<style>
+  .search-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
 
-<form action="{{ url_for('search_text') }}" method="POST" style="margin-bottom: 30px;" id="searchForm">
-    <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
-        <div style="flex: 2; min-width: 250px; position: relative;">
-            <label style="display: block; margin-bottom: 5px; color: #2e7d32; font-weight: 600;">Từ khóa / Mô tả</label>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" name="keyword" id="keywordInput" placeholder="Nhập tên, mô tả, đặc điểm trái cây..." value="{{ keyword|default('') }}"
-                       style="padding:12px; width:100%; border: 2px solid #81c784; border-radius: 8px; box-sizing: border-box; font-size: 1rem;">
-                <button type="button" id="voiceBtn" title="Tìm kiếm bằng giọng nói"
-                        style="padding: 12px 15px; background-color: #ff5722; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1.2rem; transition: all 0.3s;">
-                    🎤
-                </button>
-            </div>
-            <div id="voiceStatus" style="display: none; margin-top: 8px; padding: 8px 12px; background: #fff3e0; border-radius: 6px; color: #e65100; font-size: 0.9rem;">
-                🎙️ Đang nghe... Hãy nói tên trái cây!
-            </div>
-        </div>
-        
-        <button type="submit"
-                style="padding:12px 30px; background-color:#81c784; color:white; border:none; border-radius:8px; font-weight: 600; cursor: pointer; font-size: 1rem;">
-            🔍 Tìm kiếm
-        </button>
+  .search-header h2 {
+    font-size: 2rem;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .search-header p {
+    color: var(--text-light);
+  }
+
+  .search-box {
+    background: var(--bg);
+    border-radius: 25px;
+    padding: 30px;
+    box-shadow: 
+      10px 10px 25px var(--shadow-dark),
+      -10px -10px 25px var(--shadow-light);
+    margin-bottom: 40px;
+  }
+
+  .search-main {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .search-input-wrapper {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+  }
+
+  .search-input-wrapper input {
+    flex: 1;
+  }
+
+  .voice-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #ff7043, #e64a19);
+    border: none;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 
+      4px 4px 10px var(--shadow-dark),
+      -4px -4px 10px var(--shadow-light);
+    transition: all 0.3s ease;
+  }
+
+  .voice-btn:hover {
+    transform: scale(1.05);
+  }
+
+  .voice-btn.listening {
+    background: linear-gradient(145deg, #d32f2f, #b71c1c);
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .voice-status {
+    display: none;
+    margin-top: 15px;
+    padding: 12px 20px;
+    background: var(--bg);
+    border-radius: 12px;
+    color: var(--primary);
+    font-size: 0.9rem;
+    box-shadow: 
+      inset 3px 3px 8px var(--shadow-dark),
+      inset -3px -3px 8px var(--shadow-light);
+  }
+
+  .filters-toggle {
+    color: var(--primary);
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .filters-toggle:hover {
+    text-decoration: underline;
+  }
+
+  .filters-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--bg);
+    border-radius: 15px;
+    box-shadow: 
+      inset 4px 4px 10px var(--shadow-dark),
+      inset -4px -4px 10px var(--shadow-light);
+  }
+
+  .filter-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text);
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+  }
+
+  .results-header h3 {
+    color: var(--text);
+    font-size: 1.3rem;
+  }
+
+  .results-count {
+    background: var(--bg);
+    padding: 8px 16px;
+    border-radius: 20px;
+    color: var(--primary);
+    font-weight: 500;
+    box-shadow: 
+      3px 3px 8px var(--shadow-dark),
+      -3px -3px 8px var(--shadow-light);
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
+  }
+
+  .fruit-card {
+    background: var(--bg);
+    border-radius: 20px;
+    padding: 20px;
+    text-decoration: none;
+    box-shadow: 
+      8px 8px 20px var(--shadow-dark),
+      -8px -8px 20px var(--shadow-light);
+    transition: all 0.3s ease;
+  }
+
+  .fruit-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 
+      12px 12px 30px var(--shadow-dark),
+      -12px -12px 30px var(--shadow-light);
+  }
+
+  .fruit-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-bottom: 15px;
+  }
+
+  .fruit-card .name {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+
+  .fruit-card .origin {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .fruit-card .score {
+    color: var(--primary);
+    font-size: 0.8rem;
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 50px;
+    color: var(--text-light);
+  }
+
+  .no-results-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+  }
+
+  .messages {
+    list-style: none;
+    margin-bottom: 20px;
+  }
+
+  .messages li {
+    background: #ffebee;
+    color: #c62828;
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+</style>
+
+<div class="search-header">
+  <h2>Tìm kiếm trái cây</h2>
+  <p>Nhập tên, mô tả hoặc đặc điểm của trái cây bạn muốn tìm</p>
+</div>
+
+<form action="{{ url_for('search_text') }}" method="POST" id="searchForm">
+  <div class="search-box">
+    <div class="search-main">
+      <div class="search-input-wrapper">
+        <input type="text" name="keyword" id="keywordInput" class="neu-input" style="width: 100%;"
+               placeholder="Ví dụ: trái cây ngọt, màu vàng, miền Tây..." 
+               value="{{ keyword|default('') }}">
+        <button type="button" id="voiceBtn" class="voice-btn" title="Tìm bằng giọng nói">Mic</button>
+      </div>
+      <button type="submit" class="neu-btn neu-btn-primary">Tìm kiếm</button>
     </div>
     
-    <details style="margin-top: 15px;">
-        <summary style="cursor: pointer; color: #388e3c; font-weight: 600;">⚙️ Bộ lọc nâng cao</summary>
-        <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px; padding: 15px; background: #f1f8e9; border-radius: 8px;">
-            <div style="flex: 1; min-width: 120px;">
-                <label style="display: block; margin-bottom: 5px; color: #2e7d32; font-weight: 600;">Màu sắc</label>
-                <select name="color" style="padding:10px; width:100%; border: 2px solid #81c784; border-radius: 8px; background: white;">
-                    <option value="">-- Tất cả --</option>
-                    {% for color in filter_options.colors|default([]) %}
-                    <option value="{{ color }}" {% if selected_color == color %}selected{% endif %}>{{ color }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div style="flex: 1; min-width: 120px;">
-                <label style="display: block; margin-bottom: 5px; color: #2e7d32; font-weight: 600;">Mùa vụ</label>
-                <select name="season" style="padding:10px; width:100%; border: 2px solid #81c784; border-radius: 8px; background: white;">
-                    <option value="">-- Tất cả --</option>
-                    {% for season in filter_options.seasons|default([]) %}
-                    <option value="{{ season }}" {% if selected_season == season %}selected{% endif %}>{{ season }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div style="flex: 1; min-width: 150px;">
-                <label style="display: block; margin-bottom: 5px; color: #2e7d32; font-weight: 600;">Nguồn gốc</label>
-                <select name="origin" style="padding:10px; width:100%; border: 2px solid #81c784; border-radius: 8px; background: white;">
-                    <option value="">-- Tất cả --</option>
-                    {% for origin in filter_options.origins|default([]) %}
-                    <option value="{{ origin }}" {% if selected_origin == origin %}selected{% endif %}>{{ origin }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+    <div id="voiceStatus" class="voice-status">
+      🎙️ Đang nghe... Hãy nói tên trái cây!
+    </div>
+
+    <details>
+      <summary class="filters-toggle">Bộ lọc nâng cao</summary>
+      <div class="filters-content">
+        <div class="filter-group">
+          <label>Màu sắc</label>
+          <select name="color" class="neu-select" style="width: 100%;">
+            <option value="">Tất cả</option>
+            {% for color in filter_options.colors|default([]) %}
+            <option value="{{ color }}" {% if selected_color == color %}selected{% endif %}>{{ color }}</option>
+            {% endfor %}
+          </select>
         </div>
+        
+        <div class="filter-group">
+          <label>Mùa vụ</label>
+          <select name="season" class="neu-select" style="width: 100%;">
+            <option value="">Tất cả</option>
+            {% for season in filter_options.seasons|default([]) %}
+            <option value="{{ season }}" {% if selected_season == season %}selected{% endif %}>{{ season }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label>Nguồn gốc</label>
+          <select name="origin" class="neu-select" style="width: 100%;">
+            <option value="">Tất cả</option>
+            {% for origin in filter_options.origins|default([]) %}
+            <option value="{{ origin }}" {% if selected_origin == origin %}selected{% endif %}>{{ origin }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
     </details>
+  </div>
 </form>
 
 {% with messages = get_flashed_messages() %}
   {% if messages %}
-    <ul class="messages" style="color:red; margin-bottom:20px;">
+    <ul class="messages">
       {% for message in messages %}
         <li>{{ message }}</li>
       {% endfor %}
@@ -75,103 +294,94 @@
 {% endwith %}
 
 {% if results %}
-    <h3>Kết quả tìm kiếm: {{ results|length }} trái cây</h3>
-    <div style="margin-top:20px; display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
-        {% for item in results %}
-            <a href="/fruit/{{ item.payload.name }}" style="text-decoration:none;">
-                <div style="background:white; border-radius:12px; padding:15px; text-align:center;
-                            box-shadow:0 4px 8px rgba(0,0,0,0.1); transition: transform 0.2s ease; height: 100%;">
-                    <img src="{{ item.payload.image_url }}" alt="{{ item.payload.name }}"
-                         style="width:100%; height:150px; object-fit:cover; border-radius:8px;">
-                    <strong style="color:#2e7d32; font-size:1.1rem; display:block; margin-top:10px;">
-                        {{ item.payload.name }}
-                    </strong>
-                    {% if item.payload.origin %}
-                    <div style="color:#666; font-size:0.9rem; margin-top:5px;">📍 {{ item.payload.origin }}</div>
-                    {% endif %}
-                    {% if item.score and item.score < 1 %}
-                    <div style="color:#888; font-style:italic; font-size:0.85rem;">Độ tương đồng: {{ (item.score * 100)|round(1) }}%</div>
-                    {% endif %}
-                </div>
-            </a>
-        {% endfor %}
-    </div>
+  <div class="results-header">
+    <h3>Kết quả tìm kiếm</h3>
+    <span class="results-count">{{ results|length }} trái cây</span>
+  </div>
+  
+  <div class="results-grid">
+    {% for item in results %}
+      <a href="/fruit/{{ item.payload.name }}" class="fruit-card">
+        <img src="{{ item.payload.image_url }}" alt="{{ item.payload.name }}">
+        <div class="name">{{ item.payload.name }}</div>
+        {% if item.payload.origin %}
+          <div class="origin">{{ item.payload.origin }}</div>
+        {% endif %}
+        {% if item.score and item.score < 1 %}
+          <div class="score">Độ tương đồng: {{ (item.score * 100)|round(1) }}%</div>
+        {% endif %}
+      </a>
+    {% endfor %}
+  </div>
 {% elif keyword or selected_color or selected_season or selected_origin %}
-    <p style="margin-top:20px; color:#888;">Không tìm thấy kết quả phù hợp.</p>
+  <div class="no-results">
+    <div class="no-results-icon">🍃</div>
+    <p>Không tìm thấy kết quả phù hợp</p>
+  </div>
 {% else %}
-    <p style="margin-top:20px; color:#666;">Nhập từ khóa hoặc chọn bộ lọc để tìm kiếm trái cây.</p>
+  <div class="no-results">
+    <div class="no-results-icon">🔍</div>
+    <p>Nhập từ khóa hoặc chọn bộ lọc để bắt đầu tìm kiếm</p>
+  </div>
 {% endif %}
 
 <script>
-// Voice Search - Tìm kiếm bằng giọng nói
 const voiceBtn = document.getElementById('voiceBtn');
 const keywordInput = document.getElementById('keywordInput');
 const voiceStatus = document.getElementById('voiceStatus');
 const searchForm = document.getElementById('searchForm');
 
-// Kiểm tra trình duyệt hỗ trợ
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 if (SpeechRecognition) {
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'vi-VN'; // Tiếng Việt
-    recognition.continuous = false;
-    recognition.interimResults = true;
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'vi-VN';
+  recognition.continuous = false;
+  recognition.interimResults = true;
 
-    let isListening = false;
+  let isListening = false;
 
-    voiceBtn.addEventListener('click', () => {
-        if (isListening) {
-            recognition.stop();
-            return;
-        }
-        
-        recognition.start();
-    });
+  voiceBtn.addEventListener('click', () => {
+    if (isListening) {
+      recognition.stop();
+      return;
+    }
+    recognition.start();
+  });
 
-    recognition.onstart = () => {
-        isListening = true;
-        voiceBtn.style.backgroundColor = '#d32f2f';
-        voiceBtn.innerHTML = '⏹️';
-        voiceStatus.style.display = 'block';
-        voiceStatus.innerHTML = '🎙️ Đang nghe... Hãy nói tên trái cây!';
-    };
+  recognition.onstart = () => {
+    isListening = true;
+    voiceBtn.classList.add('listening');
+    voiceBtn.innerHTML = 'Stop';
+    voiceStatus.style.display = 'block';
+    voiceStatus.innerHTML = 'Đang nghe... Hãy nói tên trái cây!';
+  };
 
-    recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            transcript += event.results[i][0].transcript;
-        }
-        keywordInput.value = transcript;
-        voiceStatus.innerHTML = '✅ Đã nhận: "' + transcript + '"';
-        
-        // Nếu là kết quả cuối cùng, tự động submit
-        if (event.results[event.results.length - 1].isFinal) {
-            setTimeout(() => {
-                searchForm.submit();
-            }, 500);
-        }
-    };
+  recognition.onresult = (event) => {
+    let transcript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    keywordInput.value = transcript;
+    voiceStatus.innerHTML = 'Đã nhận: "' + transcript + '"';
+    
+    if (event.results[event.results.length - 1].isFinal) {
+      setTimeout(() => searchForm.submit(), 500);
+    }
+  };
 
-    recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        voiceStatus.innerHTML = '❌ Lỗi: ' + (event.error === 'no-speech' ? 'Không nghe thấy giọng nói' : event.error);
-        voiceStatus.style.background = '#ffebee';
-        voiceStatus.style.color = '#c62828';
-    };
+  recognition.onerror = (event) => {
+    voiceStatus.innerHTML = 'Lỗi: ' + (event.error === 'no-speech' ? 'Không nghe thấy giọng nói' : event.error);
+  };
 
-    recognition.onend = () => {
-        isListening = false;
-        voiceBtn.style.backgroundColor = '#ff5722';
-        voiceBtn.innerHTML = '🎤';
-        setTimeout(() => {
-            voiceStatus.style.display = 'none';
-        }, 2000);
-    };
+  recognition.onend = () => {
+    isListening = false;
+    voiceBtn.classList.remove('listening');
+    voiceBtn.innerHTML = 'Mic';
+    setTimeout(() => voiceStatus.style.display = 'none', 2000);
+  };
 } else {
-    // Trình duyệt không hỗ trợ
-    voiceBtn.style.display = 'none';
-    console.log('Trình duyệt không hỗ trợ Speech Recognition');
+  voiceBtn.style.display = 'none';
 }
 </script>
 {% endblock %}

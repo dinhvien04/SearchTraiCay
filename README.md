@@ -1,27 +1,27 @@
-# 🍎 FruitGo - Hệ thống tìm kiếm trái cây Việt Nam
+# Orchard - Hệ thống tìm kiếm trái cây Việt Nam
 
-Ứng dụng web sử dụng AI để tìm kiếm và nhận diện trái cây Việt Nam thông qua từ khóa/mô tả, hình ảnh hoặc giọng nói.
+Ứng dụng web sử dụng AI để tìm kiếm và nhận diện trái cây Việt Nam thông qua từ khóa, hình ảnh hoặc giọng nói.
 
-## ✨ Tính năng
+## Tính năng
 
-- **Tìm kiếm bằng từ khóa/mô tả**: Nhập tên, đặc điểm, mô tả trái cây để tìm kiếm (semantic search)
-- **Tìm kiếm bằng hình ảnh**: Upload ảnh trái cây, hệ thống nhận diện và trả về top 5 kết quả tương tự
-- **Tìm kiếm bằng giọng nói**: Nói tên trái cây bằng tiếng Việt để tìm kiếm
-- **Bộ lọc nâng cao**: Lọc theo màu sắc, mùa vụ, nguồn gốc
-- **So sánh trái cây**: So sánh thông tin chi tiết giữa 2 loại trái cây
-- **Gợi ý tương tự**: Xem các loại trái cây có đặc điểm tương tự
-- **Chatbot AI**: Hỏi đáp về trái cây với AI (RAG + LLM)
+- Tìm kiếm bằng từ khóa/mô tả (semantic search)
+- Tìm kiếm bằng hình ảnh (image similarity)
+- Tìm kiếm bằng giọng nói (tiếng Việt)
+- Bộ lọc theo màu sắc, mùa vụ, nguồn gốc
+- So sánh thông tin giữa 2 loại trái cây
+- Gợi ý trái cây tương tự
+- Chatbot AI hỏi đáp (RAG + LLM)
 
-## 🛠️ Công nghệ sử dụng
+## Công nghệ
 
-- **Backend**: Flask (Python)
-- **Vector Database**: Qdrant
-- **Text Embedding**: SentenceTransformers (paraphrase-multilingual-MiniLM-L12-v2)
-- **Image Embedding**: EfficientNet-B0 (PyTorch)
-- **LLM API**: MegaLLM (GPT-5-mini)
-- **Frontend**: HTML, CSS, JavaScript, Jinja2
+- Backend: Flask (Python)
+- Vector Database: Qdrant
+- Text Embedding: SentenceTransformers (paraphrase-multilingual-MiniLM-L12-v2)
+- Image Embedding: EfficientNet-B0 (PyTorch)
+- LLM: MegaLLM API
+- Frontend: HTML, CSS, JavaScript
 
-## 📦 Cài đặt
+## Cài đặt
 
 ### 1. Clone repository
 
@@ -46,32 +46,24 @@ pip install -r requirements.txt
 
 ### 4. Cấu hình environment
 
-Tạo file `.env` với nội dung:
+Tạo file `.env`:
 
 ```env
 MEGALLM_API_KEY=your_api_key_here
 MEGALLM_MODEL=gpt-5-mini
 ```
 
-> Lấy API key tại: https://megallm.io
-
-### 5. Khởi động Qdrant (Docker)
+### 5. Khởi động Qdrant
 
 ```bash
 docker run -p 6333:6333 qdrant/qdrant
 ```
 
-### 6. Tạo vector và insert vào database
+### 6. Insert dữ liệu vào database
 
 ```bash
-# Set PYTHONPATH
 $env:PYTHONPATH = "."  # PowerShell
-# export PYTHONPATH="."  # Linux/Mac
-
-# Insert text vectors
 python qdrant_utils/insert_text_vectors.py
-
-# Insert image vectors
 python qdrant_utils/insert_image_vectors.py
 ```
 
@@ -83,75 +75,55 @@ python app.py
 
 Truy cập: http://localhost:5000
 
-## 📁 Cấu trúc thư mục
+## Cấu trúc thư mục
 
 ```
-SearchTraiCay/
-├── app.py                    # Flask application
-├── requirements.txt          # Python dependencies
-├── .env                      # Environment variables (không push lên git)
+├── app.py                     # Flask application
+├── requirements.txt
+├── .env
 ├── data/
 │   └── metadata/
 │       ├── fruit_metadata.csv
 │       └── fruit_metadata.json
 ├── embedding/
-│   ├── generate_text_vec.py  # Tạo text embeddings
-│   └── generate_image_vec.py # Tạo image embeddings
+│   ├── generate_text_vec.py
+│   └── generate_image_vec.py
 ├── qdrant_utils/
-│   ├── connect.py            # Kết nối Qdrant
+│   ├── connect.py
 │   ├── insert_text_vectors.py
 │   ├── insert_image_vectors.py
 │   ├── search_text_vectors.py
 │   └── search_image_vectors.py
-├── static/
-│   └── images/               # Ảnh trái cây
-├── templates/
-│   ├── layout.html
-│   ├── home.html
-│   ├── search_text.html      # Tìm kiếm từ khóa + giọng nói
-│   ├── search_image.html     # Tìm kiếm ảnh
-│   ├── fruit_detail.html     # Chi tiết + gợi ý tương tự
-│   ├── compare.html          # So sánh trái cây
-│   └── chatbot.html          # Chatbot AI
-└── README.md
+├── static/images/
+└── templates/
+    ├── layout.html
+    ├── home.html
+    ├── search_text.html
+    ├── search_image.html
+    ├── fruit_detail.html
+    ├── compare.html
+    └── chatbot.html
 ```
 
-## 📊 Dataset
+## Cách hoạt động
 
-- **358 loại trái cây** Việt Nam
-- Thông tin: tên, mô tả, đặc điểm, nguồn gốc, màu sắc, mùa vụ, category
-- Hình ảnh minh họa cho từng loại
-
-## 🔍 Cách hoạt động
-
-### Tìm kiếm văn bản (Semantic Search)
-1. Người dùng nhập từ khóa/mô tả
-2. Text được chuyển thành vector embedding bằng SentenceTransformers
-3. Tìm kiếm vector tương đồng trong Qdrant
-4. Trả về kết quả có độ tương đồng cao nhất
+### Tìm kiếm văn bản
+Text được chuyển thành vector embedding bằng SentenceTransformers, sau đó tìm kiếm vector tương đồng trong Qdrant.
 
 ### Tìm kiếm hình ảnh
-1. Người dùng upload ảnh trái cây
-2. Ảnh được chuyển thành vector embedding bằng EfficientNet-B0
-3. Tìm kiếm vector tương đồng trong collection ảnh
-4. Trả về top 5 kết quả giống nhất
+Ảnh được chuyển thành vector đặc trưng bằng EfficientNet-B0, so sánh với các vector ảnh trong database để tìm kết quả tương tự.
 
-### Chatbot AI (RAG)
-1. Người dùng đặt câu hỏi
-2. Tìm kiếm thông tin liên quan từ database (Retrieval)
-3. Gửi context + câu hỏi cho LLM (MegaLLM)
-4. LLM trả lời dựa trên dữ liệu thực
+### Chatbot (RAG)
+Tìm kiếm thông tin liên quan từ database, gửi context kèm câu hỏi cho LLM để tạo câu trả lời.
 
-## 🖼️ Screenshots
+## Lưu ý
 
-| Trang chủ | Tìm kiếm | Chatbot |
-|-----------|----------|---------|
-| ![Home](screenshots/home.png) | ![Search](screenshots/search.png) | ![Chat](screenshots/chat.png) |
+Tìm kiếm ảnh hoạt động tốt nhất với ảnh quả trái cây đơn lẻ, rõ ràng. Ảnh chụp cả cây hoặc có nhiều đối tượng có thể cho kết quả không chính xác do model so sánh đặc trưng hình ảnh tổng thể.
 
-## 📝 License
+## License
 
 MIT License
 
-## 👤 Tác giả
+## Tác giả
 
-- GitHub: [@dinhvien04](https://github.com/dinhvien04)
+GitHub: [@dinhvien04](https://github.com/dinhvien04)
